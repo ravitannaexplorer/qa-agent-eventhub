@@ -11,6 +11,9 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+import dotenv from 'dotenv';
+dotenv.config();
+
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
@@ -26,12 +29,12 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+  baseURL: process.env.BASE_URL,
+  extraHTTPHeaders: {
+    'Authorization': `Bearer ${process.env.API_TOKEN}`,
   },
+  trace: 'on-first-retry',
+},
 
   /* Configure projects for major browsers */
   projects: [
