@@ -104,5 +104,4 @@ test.describe('Day 1: Full Page Locator Coverage', () => {
     const contactLink = frame.locator('a[href*="contact"]').first();
     await expect(contactLink).toBeAttached({ timeout: 30000 });
   });
-
 }); // This single brace closes the test.describe
