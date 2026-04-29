@@ -5,7 +5,10 @@
       "mcp__playwright__browser_evaluate",
       "mcp__playwright__browser_fill_form",
       "mcp__playwright__browser_navigate",
-      "mcp__playwright__browser_snapshot"
+      "mcp__playwright__browser_snapshot",
+      "PowerShell(cd \"c:\\\\Users\\\\Ravi\\\\2.Playwright Training\"; npx ts-node scripts/verify-parser.ts; Write-Host \"Exit code: $LASTEXITCODE\")",
+      "PowerShell(cd \"c:\\\\Users\\\\Ravi\\\\2.Playwright Training\"; $env:TS_NODE_SKIP_IGNORE=\"true\"; npx ts-node --transpile-only scripts/verify-parser.ts | Tee-Object -FilePath out.txt; Get-Content out.txt)",
+      "PowerShell(cd \"c:\\\\Users\\\\Ravi\\\\2.Playwright Training\"; $proc = Start-Process -FilePath \"npx\" -ArgumentList \"ts-node\",\"scripts/verify-parser.ts\" -Wait -PassThru -RedirectStandardOutput \"stdout.txt\" -RedirectStandardError \"stderr.txt\" -NoNewWindow; Write-Host \"Exit: $\\($proc.ExitCode\\)\"; Get-Content stdout.txt; Write-Host \"---STDERR---\"; Get-Content stderr.txt)"
     ]
   }
 }
