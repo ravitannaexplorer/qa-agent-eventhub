@@ -1,171 +1,329 @@
-Here's the COMPLETE prompts.md file to paste:
-markdown
+# Prompt Library — EventHub Playwright Test Suite
 
-# Prompt Library for AI Test Generation
+## Project Setup
+- App URL     : https://eventhub.rahulshettyacademy.com
+- Excel file  : test-data/test-cases-v4.xlsx
+- Parser      : utils/excel-reader.ts (already built)
+- Skill file  : skills/playwright-test-writer/SKILL.md
+- Engineer    : Ravi
 
-## Template 1: Basic Feature Test
+---
 
-Generate a Playwright test for [FEATURE_NAME] on EventHub:
+## Prompt: Build Data-Driven Test Engine — Login Module
 
-APPLICATION: EventHub - Event booking platform BASE URL: https://eventhub.rahulshettyacademy.com/ CREDENTIALS: ravitanna2015@gmail.com / Ravitanna@2015
+### What to do
+Read skills/playwright-test-writer/SKILL.md first.
+Use Playwright MCP to open the login page and inspect
+real selectors before writing any code.
 
-USER FLOW:
+Build TWO files:
 
-    [Step 1 description]
-    [Step 2 description]
-    [Step 3 description]
+---
 
-VALIDATION POINTS:
+### FILE 1 — pages/LoginPage.ts (Page Object)
 
-    [What to verify after each step]
+A reusable class that wraps all login page interactions.
+Any test — data-driven or manual — imports this class.
 
-EDGE CASES TO COVER:
+The class must have these methods:
 
-    [Edge case 1]
-    [Edge case 2]
+  navigate()
+    → goes to /login
 
-Follow skills/playwright-test-writer/SKILL.md strictly.
+  fillEmail(email: string)
+    → fills the email field
 
+  fillPassword(password: string)
+    → fills the password field
 
-## Template 2: Login Test (Generic)
+  clickSignIn()
+    → clicks the Sign In button
 
-Generate a Playwright test for Login functionality on EventHub:
+  login(email: string, password: string)
+    → calls fillEmail + fillPassword + clickSignIn together
+    → use this for happy path tests
 
-APPLICATION: EventHub BASE URL: https://eventhub.rahulshettyacademy.com/ FEATURE: User Login
+  assertRedirectedTo(urlPattern: string)
+    → asserts page URL matches the pattern
 
-TEST CASES:
+  assertErrorMessage(message: string)
+    → asserts error alert contains the message
 
-    Valid login - Success path
-        Email: ravitanna2015@gmail.com
-        Password: Ravitanna@2015
-        Expected: Redirect to dashboard, user greeting visible
-    Invalid email format
-        Email: invalid-email
-        Expected: Validation error shown, form not submitted
-    Wrong password
-        Email: ravitanna2015@gmail.com
-        Password: WrongPass123
-        Expected: "Invalid credentials" error
+  assertStillOnLoginPage()
+    → asserts URL still contains /login
 
-CONSTRAINTS:
+  assertNotOnProtectedPage()
+    → asserts URL does not contain /events, /bookings, /dashboard
 
-    Read and follow skills/playwright-test-writer/SKILL.md
-    Use getByPlaceholder() for email/password fields
-    Use getByRole() for buttons
-    Include beforeEach for navigation
-    Add review header
+Rules for LoginPage.ts:
+- Constructor takes page: Page from Playwright
+- Use getByLabel or getByRole selectors only — inspect real page first
+- Each method does ONE thing only
+- Export the class as default
 
-OUTPUT: Complete runnable .spec.ts file
+Example of what the class looks like when done:
 
+  export class LoginPage {
+    constructor(private page: Page) {}
 
-## Template 3: Form Validation Test
+    async navigate() {
+      await this.page.goto('/login')
+    }
 
-Generate form validation tests for [FORM_NAME]:
+    async login(email: string, password: string) {
+      await this.fillEmail(email)
+      await this.fillPassword(password)
+      await this.clickSignIn()
+    }
+    // ... etc
+  }
 
-FORM FIELDS:
+---
 
-    [Field 1]: [Type] - [Validation rules]
-    [Field 2]: [Type] - [Validation rules]
+### FILE 2 — tests/day4-excel-driven.spec.ts
 
-TEST SCENARIOS:
+A spec that uses LoginPage + Excel data together.
 
-    All fields valid → form submits
-    [Field X] empty → show "[Error message]"
-    [Field Y] invalid format → show "[Error message]"
-    Multiple errors → show all simultaneously
+Structure:
 
-Use getByLabel() for fields, getByRole() for buttons.
-Follow skills/playwright-test-writer/SKILL.md.
+  import LoginPage from '../pages/LoginPage'
+  import { parseExcelTestCases } from '../utils/excel-reader'
 
+  const loginCases = parseExcelTestCases(EXCEL_PATH, { module: 'Login' })
 
-## Template 4: Screenshot to Test
+  test.describe('Login Module — Data Driven', () => {
 
-I've attached a screenshot of [PAGE_NAME] from EventHub.
+    test.beforeEach(async ({ page }) => {
+      loginPage = new LoginPage(page)
+      await loginPage.navigate()
+    })
 
-Please analyze and generate:
+    for (const tc of loginCases) {
+      test(`[${tc.testId}] ${tc.testName}`, async ({ page }) => {
 
-    Complete Playwright test covering the main user flow
-    3 edge-case tests for form/interaction validation
-    Recommended data-testid attributes (as comments)
+        // Arrange — already done in beforeEach
 
-Assume login is already handled in beforeEach hook. Base URL: https://eventhub.rahulshettyacademy.com/ Follow skills/playwright-test-writer/SKILL.md.
+        // Act
+        await loginPage.fillEmail(tc.inputData.email)
+        await loginPage.fillPassword(tc.inputData.password)
+        await loginPage.clickSignIn()
 
+        // Assert — based on what InputData contains
+        if (tc.inputData.expectedUrl) {
+          await loginPage.assertRedirectedTo(tc.inputData.expectedUrl)
+        } else if (tc.inputData.expectedError) {
+          await loginPage.assertErrorMessage(tc.inputData.expectedError)
+        } else {
+          await loginPage.assertNotOnProtectedPage()
+        }
+      })
+    }
+  })
 
-## Template 5: EventHub Login Test (With Actual Selectors from Antigravity)
+This way if you want to test TC-002 manually you can write:
 
-Generate a Playwright test for Login functionality on EventHub:
+  test('manual TC-002 repro', async ({ page }) => {
+    const loginPage = new LoginPage(page)
+    await loginPage.navigate()
+    await loginPage.login('ravitanna2015@gmail.com', 'wrongpassword')
+    await loginPage.assertErrorMessage('Invalid email or password')
+  })
 
-APPLICATION: EventHub - Event booking platform BASE URL: https://eventhub.rahulshettyacademy.com/ FEATURE: User Authentication - Login
+No Excel needed. The page object works standalone too.
 
-SELECTORS DISCOVERED BY ANTIGRAVITY:
+---
 
-    Email field: id=#email, placeholder='you@email.com', label='Email'
-    Password field: id=#password, placeholder='••••••', label='Password'
-    Login button: id=#login-btn, text='Sign In'
-    Post-login behavior: User stays at https://eventhub.rahulshettyacademy.com/
+### Run command
+npx playwright test tests/day4-excel-driven.spec.ts --headed
 
-TEST CASES TO GENERATE:
+### Expected result
+6 tests named:
+[TC-001] Log in with valid credentials
+[TC-002] Fail login with wrong password
+[TC-003] Fail login with invalid email format
+[TC-004] Fail login with both fields empty
+[TC-005] Attempt SQL injection in email field
+[TC-006] Attempt XSS payload in password field
 
-    Valid login - Success path
-        Email: ravitanna2015@gmail.com
-        Password: Ravitanna@2015
-        Expected: Login succeeds, stays at same URL, user profile/greeting/welcome message visible
-    Invalid email format
-        Email: invalid-email (no @ symbol)
-        Expected: Validation error shown OR form doesn't submit
-    Wrong password
-        Email: ravitanna2015@gmail.com
-        Password: WrongPass123
-        Expected: Error message displayed (e.g., "Invalid credentials", "Login failed")
-    Empty fields
-        Email: empty
-        Password: empty
-        Expected: Validation errors for both fields OR submit button disabled
+If any test fails → show exact error, do not fix silently.
 
-CONSTRAINTS - FOLLOW STRICTLY:
+---
 
-    Read skills/playwright-test-writer/SKILL.md FIRST before writing any code
-    PREFER semantic selectors over ID selectors:
-        Use getByLabel('Email') instead of locator('#email')
-        Use getByLabel('Password') instead of locator('#password')
-        Use getByRole('button', { name: 'Sign In' }) instead of locator('#login-btn')
-    Include test.describe('User Authentication') wrapper
-    Include test.beforeEach() for navigation to base URL
-    Add /* AI-GENERATED — Review required | Engineer: | Date: */ header at top
-    Follow AAA structure (Arrange-Act-Assert) with blank lines between sections
-    Import from '@playwright/test' NOT from 'playwright'
-    Test names MUST follow: 'should [action] when [condition]'
-    NO hardcoded waits (no page.waitForTimeout())
-    Use specific assertions: toBeVisible(), toHaveURL(), toContainText()
-    Add comments explaining what each assertion verifies
+## Step 4 — Swagger Pipeline
 
-OUTPUT FORMAT:
-Return ONLY the complete TypeScript file content.
-No explanations before or after the code.
-No markdown code fences (no ```typescript).
-Just the raw .ts file content ready to save as: tests/day3-ai-generated/login-ai.spec.ts
+### What to build
+Two things:
+1. Auto-generate TypeScript types from the Swagger/OpenAPI spec
+2. Auto-generate a Markdown API reference doc from the same spec
 
+### Application API details
+- Swagger URL : https://api.eventhub.rahulshettyacademy.com/api/docs/
+- Bearer Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxMzYsImVtYWlsIjoicmF2aXRhbm5hMjAxNUBnbWFpbC5jb20iLCJpYXQiOjE3NzcyODk5MTEsImV4cCI6MTc3Nzg5NDcxMX0.kMJO5oIgYBqfotPFGduMJ4BkbIjL0lEfXezJRbB0GUM
 
-## Master Prompt Template (Most Detailed)
+### TASK 1 — Generate TypeScript types from Swagger
 
-You are an expert QA automation engineer specializing in Playwright (TypeScript).
-Generate a complete, runnable Playwright test file for the following:
+Install the package:
+  npm install -D openapi-typescript
 
-APPLICATION: EventHub - Event booking platform BASE URL: https://eventhub.rahulshettyacademy.com/ FEATURE: [Feature name, e.g. 'User Registration']
+Check if the Swagger spec is available as JSON at:
+  https://api.eventhub.rahulshettyacademy.com/api/docs/swagger.json
+  or
+  https://api.eventhub.rahulshettyacademy.com/api/docs/json
+  or fetch it directly from the docs page
 
-TEST CASES TO COVER:
+Run the generator and save output to src/api-client/Api.ts:
+  npx openapi-typescript  --output ./src/api-client/Api.ts
 
-    [Happy path description]
-    [Error / edge case description]
-    [Boundary condition]
+If the URL requires auth, download the JSON first using curl with
+the Bearer token, save it locally as swagger.json, then run:
+  npx openapi-typescript ./swagger.json --output ./src/api-client/Api.ts
 
-CONSTRAINTS:
+Verify Api.ts was created and contains exported types/interfaces.
+Print the first 30 lines of the file to confirm it looks correct.
 
-    Use getByRole() and getByLabel() selectors — avoid CSS/XPath
-    Add data-testid where needed and note them in comments
-    Include beforeEach for shared setup
-    TypeScript strict-mode compatible
-    Add /* AI-GENERATED — Review required */ header comment
+### TASK 2 — Write swagger-to-md script
 
-Follow skills/playwright-test-writer/SKILL.md strictly.
+Create scripts/swagger-to-md.ts
 
+The script must:
+1. Fetch the Swagger JSON from the docs URL (use node-fetch or axios)
+   If auth is needed, include Bearer token in the request header
+2. Parse the JSON to get all endpoints from the paths object
+3. For each endpoint write a Markdown section:
+
+   ## METHOD /path
+   **Summary:** summary text here
+   **Auth required:** Yes / No
+   **Parameters:** list any path or query params
+   **Request body:** show the schema fields if POST/PUT
+   **Response:** show the success response schema
+
+4. Save the output to docs/api-reference.md
+5. Print to console: "✅ docs/api-reference.md generated — X endpoints documented"
+
+### TASK 3 — Add npm scripts to package.json
+
+Add these scripts:
+  "gen:types" : "openapi-typescript  -o ./src/api-client/Api.ts"
+  "gen:docs"  : "ts-node scripts/swagger-to-md.ts"
+  "test:all"  : "npm run gen:types && npx playwright test"
+
+### TASK 4 — Verify everything works
+
+Run in order:
+  npm run gen:types   → should regenerate Api.ts
+  npm run gen:docs    → should regenerate docs/api-reference.md
+  npm run test:all    → should generate types then run all tests
+
+Show the console output of each command.
+Show the first 20 lines of docs/api-reference.md when done.
+
+### Rules
+- Follow skills/playwright-test-writer/SKILL.md
+- If Swagger URL is behind auth, handle it gracefully
+- If openapi-typescript fails due to spec format issues,
+  try fetching the raw JSON and fixing any schema issues first
+- Do not hard-code the Bearer token in package.json scripts —
+  read it from process.env.API_TOKEN set in .env file
+
+  ---
+
+## Section 4.5 — Swagger Typed API Tests
+
+### What to build
+A spec file that imports the auto-generated types from
+src/api-client/Api.ts and uses them to validate that real
+API responses match the expected schema.
+
+This is NOT data-driven from Excel.
+These are static typed tests — one test per key endpoint.
+The goal is: if the API changes a field name or type,
+TypeScript catches it before the test even runs.
+
+### Read first
+- src/api-client/Api.ts — understand what types/schemas exist
+- docs/api-reference.md — understand what endpoints exist
+- swagger.json — understand request/response shapes
+
+### FILE to create
+tests/day4-swagger-api.spec.ts
+
+### What the file must do
+
+Import types from Api.ts:
+  import type { components } from '../src/api-client/Api'
+
+Define typed aliases for the schemas you find in Api.ts.
+Examples (use the actual schema names from your Api.ts — 
+they may differ from these):
+  type Event    = components['schemas']['Event']
+  type Booking  = components['schemas']['Booking']
+  type AuthResponse = components['schemas']['AuthResponse']
+  (check Api.ts for the real schema names before writing)
+
+Write one test per key endpoint covering:
+
+  1. POST /api/auth/login — success
+     - Send valid credentials
+     - Assert status 200
+     - Assert response has token field (string)
+     - Assert response has userId field (number)
+     - Use the AuthResponse type to type the body
+
+  2. GET /api/events — list shape
+     - Send request without auth
+     - Assert status 200
+     - Assert response body is an array or has a data array
+     - Assert first item matches Event type shape:
+       has id, title, city, venue, price, totalSeats fields
+     - Use the Event type to type the body
+
+  3. GET /api/events/:id — single event shape
+     - Use a real event ID from your account
+     - Assert status 200
+     - Assert all required Event fields are present
+     - Assert price is a number (not a string)
+     - Assert totalSeats is a number
+
+  4. POST /api/bookings — create booking shape
+     - Send with valid Bearer token from .env
+     - Use a real event ID
+     - Assert status 201
+     - Assert response has booking id, eventId, seats fields
+     - Use Booking type to type the body
+
+  5. GET /api/bookings — list shape
+     - Send with valid Bearer token
+     - Assert status 200
+     - Assert each booking in array has required fields
+     - Assert no password or sensitive fields are exposed
+
+  6. GET /api/bookings — no token
+     - Send without auth header
+     - Assert status 401
+     - This proves auth is enforced at schema level
+
+### How to use the Bearer token
+Read from environment:
+  const TOKEN = process.env.API_TOKEN ?? ''
+
+Pass as header:
+  await request.get('/api/bookings', {
+    headers: { Authorization: `Bearer ${TOKEN}` }
+  })
+
+### Important
+Before writing tests, read src/api-client/Api.ts and find
+the actual schema names. Do not guess them.
+If a schema does not exist in Api.ts for a particular
+response, use a plain typed object instead:
+  const body: { token: string; userId: number } = await resp.json()
+
+### Run command
+npx playwright test tests/day4-swagger-api.spec.ts --headed
+
+### Expected result
+6 tests all passing.
+If any field assertion fails — that means the real API
+response does not match the Swagger spec. Report it,
+do not change the assertion to make it pass.

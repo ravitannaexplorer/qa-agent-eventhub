@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "gen:types": "openapi-typescript ./swagger.json -o ./src/api-client/Api.ts",
+    "gen:docs": "ts-node scripts/swagger-to-md.ts",
+    "test:all": "npm run gen:types && npx playwright test"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -11,6 +15,7 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.0",
+    "openapi-typescript": "^7.13.0",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
