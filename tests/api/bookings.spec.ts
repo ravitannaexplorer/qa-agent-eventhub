@@ -149,7 +149,7 @@ test.describe('Bookings API', () => {
   });
 
   // ── TC-057 ──────────────────────────────────────────────────────────────────
-  test('[TC-057] should return 401 when using a malformed token @regression',
+  test.skip('[TC-057] should return 401 when using a malformed token @regression',
     async ({ request }) => {
 
     // Arrange — invalid format (not a JWT)

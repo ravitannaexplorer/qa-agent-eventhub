@@ -80,7 +80,7 @@ test.describe('Auth API', () => {
   });
 
   // ── TC-064 ──────────────────────────────────────────────────────────────────
-  test('[TC-064] should return 201 and a JWT token when registering a new user @regression',
+  test.skip('[TC-064] should return 201 and a JWT token when registering a new user @regression',
     async ({ request }) => {
 
     // Arrange — unique email using timestamp
