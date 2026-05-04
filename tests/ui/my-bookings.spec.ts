@@ -119,7 +119,10 @@ test.describe('My Bookings Module', () => {
     await page.screenshot({ path: 'test-results/TC-027-empty-state.png', fullPage: true });
   });
 
-  // TC-028 — DISABLED in Excel (Enabled: false) — not implemented
+  // ── TC-028 ──────────────────────────────────────────────────────────────────
+  test.skip('[TC-028] should stay on bookings page when cancel dialog is declined @regression', () => {
+    // Disabled in Excel — cancel confirmation dialog has no NO/Decline button in current UI
+  });
 
   // ── TC-029 ───────────────────────────────────────────────────────────────────
   test('[TC-029] should display event title, booking reference, seat count and status on booking card @regression',

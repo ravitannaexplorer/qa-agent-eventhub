@@ -100,4 +100,9 @@ test.describe('Event Listing Module', () => {
     await page.screenshot({ path: 'test-results/TC-011-event-detail-navigation.png', fullPage: true });
   });
 
+  // ── TC-012 ──────────────────────────────────────────────────────────────────
+  test.skip('[TC-012] should handle search with extremely long string @regression', () => {
+    // Disabled in Excel — search input crashes with 500+ character strings
+  });
+
 });
