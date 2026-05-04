@@ -1,5 +1,5 @@
 /* AI-GENERATED — Review required | Engineer: Ravi | Date: 2026-05-01 */
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { ENV } from '../../utils/env';
 import { TIMEOUTS } from '../../utils/constants';
 import LoginPage from '../../pages/LoginPage';
@@ -72,11 +72,16 @@ test.describe('Admin Manage Bookings Module', () => {
   });
 
   // ── TC-042 ──────────────────────────────────────────────────────────────────
-  test.skip('[TC-042] should show empty state message when no bookings exist @regression', () => {
-    // NOTE: This test requires mocking the bookings API to return 0 results.
-    // UI-layer tests cannot intercept API responses without page.route() setup
-    // which is outside the scope of this POM-based test suite.
-    // Recommend adding this to a dedicated API-mocking spec if required.
+  test('[TC-042] should show empty state message when no bookings exist @regression',
+    async ({ page }) => {
+
+    const count = await adminBookingsPage.getBookingCount();
+    test.skip(count > 0, 'Bookings exist on shared live app — empty state cannot be triggered');
+
+    await expect(
+      page.getByText(/no bookings/i)
+        .or(page.getByTestId('empty-bookings'))
+    ).toBeVisible();
   });
 
 });
