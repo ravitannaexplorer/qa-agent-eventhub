@@ -1,27 +1,163 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# EventHub Playwright CI
+#
+# Triggers:
+#   • push / PR to main or master   → smoke suite only (fast gate, ~5 min)
+#   • schedule: 01:30 UTC (7 am IST) Mon–Fri → full regression suite
+#   • workflow_dispatch              → manual run with optional suite selector
+#
+# Secrets required (set in GitHub repo → Settings → Secrets and variables):
+#   BASE_URL        https://eventhub.rahulshettyacademy.com
+#   LOGIN_EMAIL     ravitanna2015@gmail.com
+#   LOGIN_PASSWORD  Ravitanna@2015
+#   API_TOKEN       (leave empty if not using a pre-seeded token)
+# ─────────────────────────────────────────────────────────────────────────────
+
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
+
+  # 7:00 am IST = 01:30 UTC — run the full regression suite Mon–Fri
+  schedule:
+    - cron: '30 1 * * 1-5'
+
+  # Manual trigger — choose which suite to run
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - smoke
+          - regression
+          - ui
+          - api
+          - e2e
+
+# ─── Environment variables available to all jobs ──────────────────────────────
+env:
+  BASE_URL:       ${{ secrets.BASE_URL }}
+  LOGIN_EMAIL:    ${{ secrets.LOGIN_EMAIL }}
+  LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+  API_TOKEN:      ${{ secrets.API_TOKEN }}
+  USER_EMAIL:     ${{ secrets.LOGIN_EMAIL }}
+  USER_PASSWORD:  ${{ secrets.LOGIN_PASSWORD }}
+
+# ─── Jobs ────────────────────────────────────────────────────────────────────
+
 jobs:
-  test:
-    timeout-minutes: 60
+
+  # ── Smoke: runs on every push and PR ─────────────────────────────────────────
+  smoke:
+    name: Smoke Suite
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Save auth state
+        run: npx playwright test --project=setup
+
+      - name: Run smoke suite
+        run: npx playwright test --grep @smoke --project=chromium
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-smoke-${{ github.run_number }}
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload test results JSON
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results-smoke-${{ github.run_number }}
+          path: test-results/results.json
+          retention-days: 14
+
+  # ── Full regression: runs on schedule and manual dispatch ─────────────────────
+  full:
+    name: Full Suite (${{ github.event.inputs.suite || 'regression' }})
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Save auth state
+        run: npx playwright test --project=setup
+
+      - name: Run selected suite
+        env:
+          SUITE: ${{ github.event.inputs.suite || 'regression' }}
+        run: |
+          case "$SUITE" in
+            smoke)      npx playwright test --grep @smoke      --project=chromium ;;
+            regression) npx playwright test --grep @regression --project=chromium ;;
+            ui)         npx playwright test tests/ui/          --project=chromium ;;
+            api)        npx playwright test tests/api/         --project=chromium ;;
+            e2e)        npx playwright test tests/e2e/         --project=chromium ;;
+            *)          npx playwright test                    --project=chromium ;;
+          esac
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-full-${{ github.run_number }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results JSON
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results-full-${{ github.run_number }}
+          path: test-results/results.json
+          retention-days: 30
+
+      - name: Upload failure screenshots
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: failure-screenshots-${{ github.run_number }}
+          path: test-results/**/*.png
+          retention-days: 7
