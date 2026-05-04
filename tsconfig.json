@@ -5,8 +5,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "strict": false,
-    "ignoreDeprecations": "6.0"
+    "strict": false
   },
   "exclude": ["node_modules"]
 }

@@ -10,7 +10,9 @@
       "PowerShell(cd \"c:\\\\Users\\\\Ravi\\\\2.Playwright Training\"; $env:TS_NODE_SKIP_IGNORE=\"true\"; npx ts-node --transpile-only scripts/verify-parser.ts | Tee-Object -FilePath out.txt; Get-Content out.txt)",
       "PowerShell(cd \"c:\\\\Users\\\\Ravi\\\\2.Playwright Training\"; $proc = Start-Process -FilePath \"npx\" -ArgumentList \"ts-node\",\"scripts/verify-parser.ts\" -Wait -PassThru -RedirectStandardOutput \"stdout.txt\" -RedirectStandardError \"stderr.txt\" -NoNewWindow; Write-Host \"Exit: $\\($proc.ExitCode\\)\"; Get-Content stdout.txt; Write-Host \"---STDERR---\"; Get-Content stderr.txt)",
       "Bash(curl -s -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxMzYsImVtYWlsIjoicmF2aXRhbm5hMjAxNUBnbWFpbC5jb20iLCJpYXQiOjE3NzcyODk5MTEsImV4cCI6MTc3Nzg5NDcxMX0.kMJO5oIgYBqfotPFGduMJ4BkbIjL0lEfXezJRbB0GUM' https://api.eventhub.rahulshettyacademy.com/api/docs/)",
-      "Bash(node -e \"const s=require\\('./swagger.json'\\); console.log\\(JSON.stringify\\({schemas:Object.keys\\(s.components?.schemas||{}\\), paths:Object.keys\\(s.paths\\)}, null, 2\\)\\)\")"
+      "Bash(node -e \"const s=require\\('./swagger.json'\\); console.log\\(JSON.stringify\\({schemas:Object.keys\\(s.components?.schemas||{}\\), paths:Object.keys\\(s.paths\\)}, null, 2\\)\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(npx playwright *)"
     ]
   }
 }

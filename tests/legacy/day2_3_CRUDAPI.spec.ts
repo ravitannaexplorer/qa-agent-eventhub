@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures/auth.fixture';
+import { test, expect } from '../fixtures/auth.fixture';
 
 // This ID is shared across all tests in this file
 let createdEventId: number;

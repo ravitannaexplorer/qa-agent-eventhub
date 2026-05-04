@@ -1,7 +1,7 @@
 /* AI-GENERATED — Review required | Engineer: Ravi | Date: 2026-04-30 */
 import { test } from '@playwright/test';
-import LoginPage from '../pages/LoginPage';
-import { parseExcelTestCases } from '../utils/excel-reader';
+import LoginPage from '../../pages/LoginPage';
+import { parseExcelTestCases } from '../../utils/excel-reader';
 
 const loginCases = parseExcelTestCases('./test-data/test-cases-v4.xlsx', { module: 'Login' });
 

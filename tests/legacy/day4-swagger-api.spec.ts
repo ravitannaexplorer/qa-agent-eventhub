@@ -1,6 +1,6 @@
 /* AI-GENERATED — Review required | Engineer: Ravi | Date: 2026-04-30 */
 import { test, expect } from '@playwright/test';
-import type { components } from '../src/api-client/Api';
+import type { components } from '../../src/api-client/Api';
 
 type AuthResponse = components['schemas']['AuthResponse'];
 type Event       = components['schemas']['Event'];

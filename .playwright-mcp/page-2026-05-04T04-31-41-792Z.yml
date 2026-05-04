@@ -1,0 +1,159 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e5]:
+    - generic [ref=e7]:
+      - link "EventHub" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img [ref=e10]
+        - generic [ref=e12]: EventHub
+      - generic [ref=e13]:
+        - link "Home" [ref=e14] [cursor=pointer]:
+          - /url: /
+        - link "Events" [ref=e15] [cursor=pointer]:
+          - /url: /events
+        - link "My Bookings" [ref=e16] [cursor=pointer]:
+          - /url: /bookings
+        - link "API Docs" [ref=e17] [cursor=pointer]:
+          - /url: https://api.eventhub.rahulshettyacademy.com/api/docs
+        - button "Admin" [ref=e19] [cursor=pointer]:
+          - text: Admin
+          - img [ref=e20]
+        - generic [ref=e22]:
+          - generic "ravitanna2015@gmail.com" [ref=e23]
+          - button "Logout" [ref=e24] [cursor=pointer]
+  - main [ref=e25]:
+    - generic [ref=e198]:
+      - navigation [ref=e199]:
+        - link "Events" [ref=e200] [cursor=pointer]:
+          - /url: /events
+        - generic [ref=e201]: /
+        - generic [ref=e202]: Dilli Diwali Mela
+      - generic [ref=e203]:
+        - generic [ref=e204]:
+          - img "Dilli Diwali Mela" [ref=e206]
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - generic [ref=e209]: Festival
+              - generic [ref=e210]: Featured
+            - heading "Dilli Diwali Mela" [level=1] [ref=e211]
+            - generic [ref=e212]:
+              - img [ref=e213]
+              - text: This is a featured event — always available for practice
+            - generic [ref=e215]:
+              - generic [ref=e216]:
+                - generic [ref=e217]: 📅
+                - generic [ref=e218]:
+                  - paragraph [ref=e219]: Date
+                  - paragraph [ref=e220]: Tuesday, 20 October
+              - generic [ref=e221]:
+                - generic [ref=e222]: 🕐
+                - generic [ref=e223]:
+                  - paragraph [ref=e224]: Time
+                  - paragraph [ref=e225]: 10:30 pm
+              - generic [ref=e226]:
+                - generic [ref=e227]: 📍
+                - generic [ref=e228]:
+                  - paragraph [ref=e229]: Venue
+                  - paragraph [ref=e230]: Pragati Maidan Exhibition Grounds
+              - generic [ref=e231]:
+                - generic [ref=e232]: 🌆
+                - generic [ref=e233]:
+                  - paragraph [ref=e234]: City
+                  - paragraph [ref=e235]: Delhi
+              - generic [ref=e236]:
+                - generic [ref=e237]: 🎫
+                - generic [ref=e238]:
+                  - paragraph [ref=e239]: Available
+                  - paragraph [ref=e240]: 9988 / 10000 seats
+              - generic [ref=e241]:
+                - generic [ref=e242]: 💰
+                - generic [ref=e243]:
+                  - paragraph [ref=e244]: Price per ticket
+                  - paragraph [ref=e245]: $300
+            - generic [ref=e246]:
+              - heading "About this event" [level=2] [ref=e247]
+              - paragraph [ref=e248]: Celebrate the Festival of Lights at the grandest Diwali Mela in North India. Enjoy 200+ stalls of artisanal crafts, street food, folk performances, fireworks, and cultural showcases spanning three vibrant evenings.
+        - generic [ref=e250]:
+          - generic [ref=e251]:
+            - heading "Book Tickets" [level=2] [ref=e252]
+            - generic [ref=e253]: $300
+          - paragraph [ref=e254]: per ticket
+          - generic [ref=e255]:
+            - generic [ref=e256]:
+              - generic [ref=e257]: Tickets
+              - generic [ref=e258]:
+                - button "−" [disabled] [ref=e259]
+                - generic [ref=e260]: "1"
+                - button "+" [ref=e261] [cursor=pointer]
+                - generic [ref=e262]: (max 10)
+            - generic [ref=e263]:
+              - generic [ref=e264]: Full Name*
+              - textbox "Full Name*" [ref=e265]:
+                - /placeholder: Your full name
+            - generic [ref=e266]:
+              - generic [ref=e267]: Email*
+              - textbox "Email*" [ref=e268]:
+                - /placeholder: you@email.com
+            - generic [ref=e269]:
+              - generic [ref=e270]: Phone Number*
+              - textbox "Phone Number*" [ref=e271]:
+                - /placeholder: +91 98765 43210
+            - generic [ref=e272]:
+              - generic [ref=e273]:
+                - generic [ref=e274]: $300 × 1 ticket
+                - generic [ref=e275]: $300
+              - generic [ref=e276]:
+                - generic [ref=e277]: Total
+                - generic [ref=e278]: $300
+            - button "Confirm Booking" [ref=e279] [cursor=pointer]
+  - contentinfo [ref=e159]:
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - heading "Rahul Shetty Academy" [level=3] [ref=e163]
+          - paragraph [ref=e164]: India's leading QA automation training academy — empowering engineers to build real-world testing skills.
+        - generic [ref=e165]:
+          - heading "Popular Courses" [level=3] [ref=e166]
+          - list [ref=e167]:
+            - listitem [ref=e168]:
+              - link "Selenium WebDriver with Java" [ref=e169] [cursor=pointer]:
+                - /url: https://rahulshettyacademy.com
+            - listitem [ref=e170]:
+              - link "Playwright with JavaScript" [ref=e171] [cursor=pointer]:
+                - /url: https://rahulshettyacademy.com
+            - listitem [ref=e172]:
+              - link "RestAssured API Testing" [ref=e173] [cursor=pointer]:
+                - /url: https://rahulshettyacademy.com
+            - listitem [ref=e174]:
+              - link "Cypress End-to-End Testing" [ref=e175] [cursor=pointer]:
+                - /url: https://rahulshettyacademy.com
+            - listitem [ref=e176]:
+              - link "Appium Mobile Testing" [ref=e177] [cursor=pointer]:
+                - /url: https://rahulshettyacademy.com
+        - generic [ref=e178]:
+          - heading "QA Job Hiring Platform" [level=3] [ref=e179]
+          - paragraph [ref=e180]: Get hired faster — take skill assessments trusted by top QA employers worldwide.
+          - link "techsmarthire.com →" [ref=e181] [cursor=pointer]:
+            - /url: https://techsmarthire.com
+        - generic [ref=e182]:
+          - heading "EventHub Practice App" [level=3] [ref=e183]
+          - list [ref=e184]:
+            - listitem [ref=e185]:
+              - link "Browse Events" [ref=e186] [cursor=pointer]:
+                - /url: /events
+            - listitem [ref=e187]:
+              - link "My Bookings" [ref=e188] [cursor=pointer]:
+                - /url: /bookings
+            - listitem [ref=e189]:
+              - link "Manage Events" [ref=e190] [cursor=pointer]:
+                - /url: /admin/events
+            - listitem [ref=e191]:
+              - link "API Documentation" [ref=e192] [cursor=pointer]:
+                - /url: https://api.eventhub.rahulshettyacademy.com/api/docs
+      - generic [ref=e193]:
+        - paragraph [ref=e194]: © 2026 Rahul Shetty Academy. All rights reserved.
+        - generic [ref=e195]:
+          - link "rahulshettyacademy.com →" [ref=e196] [cursor=pointer]:
+            - /url: https://rahulshettyacademy.com
+          - link "techsmarthire.com →" [ref=e197] [cursor=pointer]:
+            - /url: https://techsmarthire.com
+  - alert [ref=e4]

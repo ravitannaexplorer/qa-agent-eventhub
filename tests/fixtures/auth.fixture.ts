@@ -1,38 +1,54 @@
+/* AI-GENERATED — Review required | Engineer: Ravi | Date: 2026-05-01 */
 import { test as base, request } from '@playwright/test';
+import { URLS } from '../../utils/constants';
 
-// Define what our fixture provides to tests
+// ─── Fixture types ────────────────────────────────────────────────────────────
+
 type AuthFixtures = {
   authToken: string;
 };
 
+// ─── Auth fixture ─────────────────────────────────────────────────────────────
+
+/**
+ * Provides a valid JWT `authToken` to any test that declares it.
+ *
+ * Uses the API domain (api.eventhub.rahulshettyacademy.com) — separate from the
+ * UI base URL. The request context is created without baseURL so the absolute
+ * URLS.API_AUTH constant is used directly.
+ */
 export const test = base.extend<AuthFixtures>({
 
   authToken: async ({}, use) => {
 
-    // SETUP — runs before your test
+    // SETUP — create an isolated request context pointed at the API domain
     const ctx = await request.newContext({
-      baseURL: process.env.BASE_URL
+      baseURL: URLS.API_BASE,
     });
 
-    const resp = await ctx.post('/api/auth/login', {
+    const resp = await ctx.post(URLS.API_AUTH, {
       data: {
-        email: process.env.USER_EMAIL,
-        password: process.env.USER_PASSWORD
-      }
+        email:    process.env.LOGIN_EMAIL    ?? process.env.USER_EMAIL,
+        password: process.env.LOGIN_PASSWORD ?? process.env.USER_PASSWORD,
+      },
     });
 
-    console.log('Login status:', resp.status());
     const body = await resp.json();
-    console.log('Login response:', body);  // ← see what field holds the token
 
-    const token = body.token; // we'll confirm this field name from the log
+    if (!body.token) {
+      throw new Error(
+        `[auth.fixture] Login failed — status ${resp.status()}, body: ${JSON.stringify(body)}`
+      );
+    }
+
+    const token: string = body.token;
 
     // HAND OFF — test runs here with the token
     await use(token);
 
-    // CLEANUP — runs after test finishes
+    // CLEANUP
     await ctx.dispose();
-  }
+  },
 
 });
 

@@ -1,5 +1,5 @@
 // Notice — import from fixture file, NOT from @playwright/test
-import { test, expect } from './fixtures/auth.fixture';
+import { test, expect } from '../fixtures/auth.fixture';
 
 test('auth fixture provides a valid token', async ({ request, authToken }) => {
 
