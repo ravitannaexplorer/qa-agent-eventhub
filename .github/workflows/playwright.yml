@@ -2,9 +2,11 @@
 # EventHub Playwright CI
 #
 # Triggers:
-#   • push / PR to main or master   → smoke suite only (fast gate, ~5 min)
-#   • schedule: 01:30 UTC (7 am IST) Mon–Fri → full regression suite
-#   • workflow_dispatch              → manual run with optional suite selector
+#   • schedule: 01:30 UTC (7 am IST) Mon–Fri → full suite (ui + api + e2e)
+#   • workflow_dispatch → manual run with optional suite selector
+#
+# Push / PR triggers are intentionally absent — we do not own EventHub,
+# so there is no meaningful gate to run against a merge to main.
 #
 # Secrets required (set in GitHub repo → Settings → Secrets and variables):
 #   BASE_URL        https://eventhub.rahulshettyacademy.com
@@ -16,12 +18,7 @@
 name: Playwright Tests
 
 on:
-  push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
-
-  # 7:00 am IST = 01:30 UTC — run the full regression suite Mon–Fri
+  # 7:00 am IST = 01:30 UTC — run the full suite Mon–Fri
   schedule:
     - cron: '30 1 * * 1-5'
 
@@ -54,55 +51,9 @@ env:
 
 jobs:
 
-  # ── Smoke: runs on every push and PR ─────────────────────────────────────────
-  smoke:
-    name: Smoke Suite
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: npm
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps
-
-      - name: Save auth state
-        run: npx playwright test --project=setup
-
-      - name: Run smoke suite
-        run: npx playwright test --grep @smoke --project=chromium
-
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-report-smoke-${{ github.run_number }}
-          path: playwright-report/
-          retention-days: 14
-
-      - name: Upload test results JSON
-        uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: test-results-smoke-${{ github.run_number }}
-          path: test-results/results.json
-          retention-days: 14
-
-  # ── Full regression: runs on schedule and manual dispatch ─────────────────────
+  # ── Full suite: runs on schedule and manual dispatch ─────────────────────────
   full:
-    name: Full Suite (${{ github.event.inputs.suite || 'regression' }})
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    name: Full Suite (${{ github.event.inputs.suite || 'all' }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -147,7 +98,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report-full-${{ github.run_number }}
+          name: playwright-report-${{ github.run_number }}
           path: playwright-report/
           retention-days: 30
 
@@ -155,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: test-results-full-${{ github.run_number }}
+          name: test-results-${{ github.run_number }}
           path: test-results/results.json
           retention-days: 30
 
