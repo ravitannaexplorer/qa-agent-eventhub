@@ -126,17 +126,22 @@ jobs:
         run: npx playwright test --project=setup
 
       - name: Run selected suite
-        env:
-          SUITE: ${{ github.event.inputs.suite || 'regression' }}
         run: |
-          case "$SUITE" in
-            smoke)      npx playwright test --grep @smoke      --project=chromium ;;
-            regression) npx playwright test --grep @regression --project=chromium ;;
-            ui)         npx playwright test tests/ui/          --project=chromium ;;
-            api)        npx playwright test tests/api/         --project=chromium ;;
-            e2e)        npx playwright test tests/e2e/         --project=chromium ;;
-            *)          npx playwright test                    --project=chromium ;;
-          esac
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            npx playwright test tests/ui/ tests/api/ tests/e2e/
+          elif [ "${{ inputs.suite }}" = "smoke" ]; then
+            npx playwright test tests/ui/ tests/api/ tests/e2e/ --grep @smoke
+          elif [ "${{ inputs.suite }}" = "regression" ]; then
+            npx playwright test tests/ui/ tests/api/ tests/e2e/ --grep @regression
+          elif [ "${{ inputs.suite }}" = "ui" ]; then
+            npx playwright test tests/ui/
+          elif [ "${{ inputs.suite }}" = "api" ]; then
+            npx playwright test tests/api/
+          elif [ "${{ inputs.suite }}" = "e2e" ]; then
+            npx playwright test tests/e2e/
+          else
+            npx playwright test tests/ui/ tests/api/ tests/e2e/
+          fi
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
