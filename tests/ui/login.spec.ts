@@ -104,7 +104,7 @@ test.describe('Login Module', () => {
     await loginPage.login(EMAIL, xssPayload);
 
     // Assert
-    // DEMO FAILURE — revert after demo
+    // PERMANENT FAILURE — kept intentionally to trigger Slack CI alert on every run
     await expect(page).toHaveURL('/dashboard');
     await page.screenshot({ path: 'test-results/TC-006-xss-payload.png', fullPage: true });
   });
