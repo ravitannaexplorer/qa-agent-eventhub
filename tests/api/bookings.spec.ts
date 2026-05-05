@@ -80,15 +80,14 @@ test.describe('Bookings API', () => {
     async ({ request, authToken }) => {
 
     // Arrange — resolve a bookable event from the live list
-    const eventsResp = await request.get(URLS.API_EVENTS);
+    const headers    = { 'Authorization': `Bearer ${authToken}` };
+    const eventsResp = await request.get(URLS.API_EVENTS, { headers });
     const eventsJson = await eventsResp.json();
     const bookable   = eventsJson.data.find(
       (e: { availableSeats: number; id: number }) => e.availableSeats > 0
     );
     expect(bookable, 'No event with available seats found').toBeTruthy();
     bookableEventId  = bookable.id;
-
-    const headers = { 'Authorization': `Bearer ${authToken}` };
     const body    = {
       eventId:       bookableEventId,
       customerName:  'API Test User',

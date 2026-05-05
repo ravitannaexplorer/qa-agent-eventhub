@@ -1,5 +1,5 @@
 /* AI-GENERATED — Review required | Engineer: Ravi | Date: 2026-05-01 */
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/auth.fixture';
 import { ENV } from '../../utils/env';
 import { URLS, TIMEOUTS } from '../../utils/constants';
 
@@ -54,8 +54,8 @@ test.describe('E2E: Cross-Layer Flows', () => {
   });
 
   // ── TC-068 ──────────────────────────────────────────────────────────────────
-  test('[TC-068] Create Event via Admin UI -> Verify event appears via API @regression', 
-    async ({ page, request }) => {
+  test('[TC-068] Create Event via Admin UI -> Verify event appears via API @regression',
+    async ({ page, request, authToken }) => {
     
     const loginPage   = new LoginPage(page);
     const adminEvents = new AdminEventsPage(page);
@@ -83,7 +83,8 @@ test.describe('E2E: Cross-Layer Flows', () => {
     // Act — Verify via API
     // Use limit=100 to retrieve enough events even when the list is paginated;
     // newly created events may not appear on the default first page.
-    const resp = await request.get(`${URLS.API_EVENTS}?limit=100`);
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    const resp = await request.get(`${URLS.API_EVENTS}?limit=100`, { headers });
     expect(resp.status()).toBe(200);
     const json = await resp.json();
 
@@ -99,31 +100,28 @@ test.describe('E2E: Cross-Layer Flows', () => {
   });
 
   // ── TC-069 ──────────────────────────────────────────────────────────────────
-  test('[TC-069] Create Booking via API -> Verify in UI @regression', 
-    async ({ page, request }) => {
-    
+  test('[TC-069] Create Booking via API -> Verify in UI @regression',
+    async ({ page, request, authToken }) => {
+
     const loginPage      = new LoginPage(page);
     const myBookingsPage = new MyBookingsPage(page);
+    const headers        = { 'Authorization': `Bearer ${authToken}` };
 
     // 1. Get an event ID from API
-    const eventsResp = await request.get(URLS.API_EVENTS);
+    const eventsResp = await request.get(URLS.API_EVENTS, { headers });
     const eventsJson = await eventsResp.json();
     const eventId    = eventsJson.data[0].id;
 
     // 2. Create booking via API
-    // (Note: This requires an auth token — in E2E we usually use the process.env directly
-    // or just assume we have it. Since we are in Playwright, the request context
-    // might need the extraHTTPHeaders if not already set. But in our framework,
-    // we use global-setup to save auth state, so the request context should be fine
-    // if configured in playwright.config.ts)
     const bookResp = await request.post(URLS.API_BOOKINGS, {
+      headers,
       data: {
-        eventId: eventId,
-        quantity: 1,
-        customerName: 'API Created Booker',
+        eventId:       eventId,
+        quantity:      1,
+        customerName:  'API Created Booker',
         customerEmail: ENV.LOGIN_EMAIL,
-        customerPhone: '1234567890'
-      }
+        customerPhone: '1234567890',
+      },
     });
     if (bookResp.status() !== 201) {
       console.log(`[TC-069] API Error: ${bookResp.status()} ${await bookResp.text()}`);

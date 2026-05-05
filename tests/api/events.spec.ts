@@ -70,13 +70,13 @@ test.describe('Events API', () => {
 
   // ── TC-046 ──────────────────────────────────────────────────────────────────
   test('[TC-046] should return 200 and a paginated event array when listing all events @smoke',
-    async ({ request }) => {
+    async ({ request, authToken }) => {
 
     // Arrange
-    // (no setup required — public endpoint)
+    const headers = { 'Authorization': `Bearer ${authToken}` };
 
     // Act
-    const resp = await request.get(URLS.API_EVENTS);
+    const resp = await request.get(URLS.API_EVENTS, { headers });
 
     // Assert
     expect(resp.status()).toBe(200);
@@ -87,15 +87,16 @@ test.describe('Events API', () => {
 
   // ── TC-047 ──────────────────────────────────────────────────────────────────
   test('[TC-047] should return 200 and event detail object when fetching an existing event @regression',
-    async ({ request }) => {
+    async ({ request, authToken }) => {
 
     // Arrange — use the first event from the list to get a valid ID
-    const listResp = await request.get(URLS.API_EVENTS);
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    const listResp = await request.get(URLS.API_EVENTS, { headers });
     const listJson = await listResp.json();
     const validId: number = listJson.data[0].id;
 
     // Act
-    const resp = await request.get(`${URLS.API_EVENTS}/${validId}`);
+    const resp = await request.get(`${URLS.API_EVENTS}/${validId}`, { headers });
 
     // Assert
     expect(resp.status()).toBe(200);
@@ -106,13 +107,14 @@ test.describe('Events API', () => {
 
   // ── TC-048 ──────────────────────────────────────────────────────────────────
   test('[TC-048] should return 404 when fetching a non-existent event ID @regression',
-    async ({ request }) => {
+    async ({ request, authToken }) => {
 
     // Arrange
+    const headers = { 'Authorization': `Bearer ${authToken}` };
     const nonExistentId = 99999;
 
     // Act
-    const resp = await request.get(`${URLS.API_EVENTS}/${nonExistentId}`);
+    const resp = await request.get(`${URLS.API_EVENTS}/${nonExistentId}`, { headers });
 
     // Assert
     expect(resp.status()).toBe(404);
@@ -181,7 +183,7 @@ test.describe('Events API', () => {
     expect(json.success).toBe(true);
 
     // Verify the event is gone
-    const verify = await request.get(`${URLS.API_EVENTS}/${createdEventId}`);
+    const verify = await request.get(`${URLS.API_EVENTS}/${createdEventId}`, { headers });
     expect(verify.status()).toBe(404);
   });
 

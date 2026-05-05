@@ -34,9 +34,6 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL: process.env.BASE_URL,
-    extraHTTPHeaders: {
-      'Authorization': `Bearer ${process.env.API_TOKEN}`,
-    },
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'on-first-retry',
