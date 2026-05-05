@@ -104,7 +104,8 @@ test.describe('Login Module', () => {
     await loginPage.login(EMAIL, xssPayload);
 
     // Assert
-    await loginPage.assertErrorMessage('Invalid');
+    // DEMO FAILURE — revert after demo
+    await expect(page).toHaveURL('/dashboard');
     await page.screenshot({ path: 'test-results/TC-006-xss-payload.png', fullPage: true });
   });
 
