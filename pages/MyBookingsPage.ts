@@ -108,6 +108,7 @@ export default class MyBookingsPage {
     await expect(
       this.page.locator('[class*="booking"], article, [data-testid="booking-card"]')
         .filter({ hasText: textOrRef })
+        .first()
     ).toBeVisible({ timeout: 10_000 });
   }
 
@@ -115,7 +116,7 @@ export default class MyBookingsPage {
     await expect(
       this.page.locator('[class*="booking"], article, [data-testid="booking-card"]')
         .filter({ hasText: textOrRef })
-    ).not.toBeVisible({ timeout: 10_000 });
+    ).toHaveCount(0, { timeout: 10_000 });
   }
 
   async assertBookingCountAtLeast(n: number) {
@@ -142,7 +143,8 @@ export default class MyBookingsPage {
   async assertBookingStatus(textOrRef: string, status: 'confirmed' | 'cancelled') {
     const card = this.page
       .locator('[class*="booking"], article, [data-testid="booking-card"]')
-      .filter({ hasText: textOrRef });
+      .filter({ hasText: textOrRef })
+      .first();
     await expect(card.getByText(new RegExp(status, 'i'))).toBeVisible();
   }
 }

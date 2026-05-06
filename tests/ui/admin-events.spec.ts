@@ -1,11 +1,14 @@
 /* AI-GENERATED — Review required | Engineer: Ravi | Date: 2026-05-01 */
-import { test } from '@playwright/test';
+import { test } from '../fixtures/auth.fixture';
 import { ENV } from '../../utils/env';
-import { TIMEOUTS } from '../../utils/constants';
+import { URLS, TIMEOUTS } from '../../utils/constants';
 import LoginPage from '../../pages/LoginPage';
 import AdminManageEventsPage from '../../pages/AdminManageEventsPage';
 
 test.setTimeout(TIMEOUTS.DEFAULT);
+
+// Tracks titles of events created during this run so afterAll can delete them
+const createdEventTitles: string[] = [];
 
 test.describe('Admin Manage Events Module', () => {
   let loginPage:       LoginPage;
@@ -20,12 +23,27 @@ test.describe('Admin Manage Events Module', () => {
     await adminEventsPage.navigate();
   });
 
+  test.afterAll(async ({ request, authToken }) => {
+    if (createdEventTitles.length === 0) return;
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    const resp = await request.get(`${URLS.API_EVENTS}?limit=100`, { headers });
+    if (!resp.ok()) return;
+    const json = await resp.json();
+    for (const title of createdEventTitles) {
+      const event = json.data.find((e: { title: string; id: number }) => e.title === title);
+      if (event) {
+        await request.delete(`${URLS.API_EVENTS}/${event.id}`, { headers });
+      }
+    }
+  });
+
   // ── TC-031 ──────────────────────────────────────────────────────────────────
   test('[TC-031] should create event and show it in list when all fields are valid @smoke',
     async ({ page }) => {
 
-    // Arrange
-    const eventTitle = 'Tech Summit 2026';
+    // Arrange — unique title prevents duplicate-row failures across runs
+    const eventTitle = `Tech Summit ${Date.now()}`;
+    createdEventTitles.push(eventTitle);
 
     // Act
     await adminEventsPage.fillEventForm({

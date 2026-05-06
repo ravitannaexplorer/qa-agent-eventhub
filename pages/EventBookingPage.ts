@@ -105,7 +105,7 @@ export default class EventBookingPage {
   }
 
   async assertEventTitleVisible(title: string) {
-    await expect(this.page.locator('h1, h2, h3').filter({ hasText: title })).toBeVisible();
+    await expect(this.page.locator('h1, h2, h3').filter({ hasText: title }).first()).toBeVisible();
   }
 
   async assertSeatLimitError() {

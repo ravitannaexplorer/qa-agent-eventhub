@@ -75,7 +75,7 @@ export default class AdminManageBookingsPage {
   }
 
   async assertBookingVisible(text: string) {
-    await expect(this.getBookingRows().filter({ hasText: text })).toBeVisible();
+    await expect(this.getBookingRows().filter({ hasText: text }).first()).toBeVisible();
   }
 
   async assertColumnHeadersVisible() {

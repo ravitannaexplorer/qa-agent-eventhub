@@ -127,6 +127,7 @@ export default class AdminManageEventsPage {
   async clickEditEvent(title: string) {
     await this.getEventRows()
       .filter({ hasText: title })
+      .first()
       .getByRole('button', { name: 'Edit' })
       .click();
   }
@@ -134,6 +135,7 @@ export default class AdminManageEventsPage {
   async clickDeleteEvent(title: string) {
     await this.getEventRows()
       .filter({ hasText: title })
+      .first()
       .getByRole('button', { name: 'Delete' })
       .click();
   }
@@ -174,7 +176,7 @@ export default class AdminManageEventsPage {
   }
 
   async assertEventRowVisible(title: string) {
-    await expect(this.getEventRows().filter({ hasText: title })).toBeVisible();
+    await expect(this.getEventRows().filter({ hasText: title }).first()).toBeVisible();
   }
 
   async assertEventRowNotVisible(title: string) {

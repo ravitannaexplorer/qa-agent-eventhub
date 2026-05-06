@@ -1,5 +1,5 @@
 /* AI-GENERATED — Review required | Engineer: Ravi | Date: 2026-05-01 */
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/auth.fixture';
 import { ENV } from '../../utils/env';
 import { URLS, TIMEOUTS } from '../../utils/constants';
 
@@ -8,6 +8,13 @@ import EventListingPage from '../../pages/EventListingPage';
 import EventBookingPage from '../../pages/EventBookingPage';
 
 test.setTimeout(TIMEOUTS.BOOKING_FLOW);
+
+// Unique per run so afterAll can find and delete only the bookings this run created
+const RUN_ID   = Date.now();
+const TEST_NAME = `Test User ${RUN_ID}`;
+
+// Booking IDs created during this run — populated after each successful booking
+const createdBookingIds: number[] = [];
 
 test.describe('Event Booking Module', () => {
   let loginPage:        LoginPage;
@@ -27,21 +34,38 @@ test.describe('Event Booking Module', () => {
     bookingPage = new EventBookingPage(page);
   });
 
+  test.afterAll(async ({ request, authToken }) => {
+    if (createdBookingIds.length === 0) return;
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    for (const id of createdBookingIds) {
+      await request.delete(`${URLS.API_BOOKINGS}/${id}`, { headers });
+    }
+  });
+
   // ── TC-019 ──────────────────────────────────────────────────────────────────
   test('[TC-019] should confirm booking when all fields are filled with valid data @smoke',
-    async ({ page }) => {
+    async ({ page, request, authToken }) => {
 
     // Arrange
-    const fullName = 'Test User';
-    const email    = 'test@test.com';
-    const phone    = '9876543210';
+    const email = ENV.LOGIN_EMAIL;
+    const phone = '9876543210';
 
     // Act
-    await bookingPage.fillBookingForm(fullName, email, phone);
+    await bookingPage.fillBookingForm(TEST_NAME, email, phone);
     await bookingPage.book(1);
 
     // Assert
     await bookingPage.assertBookingConfirmed();
+
+    // Capture booking ID for cleanup
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    const resp = await request.get(`${URLS.API_BOOKINGS}?limit=100`, { headers });
+    if (resp.ok()) {
+      const json = await resp.json();
+      const booking = json.data.find((b: { customerName: string; id: number }) => b.customerName === TEST_NAME);
+      if (booking) createdBookingIds.push(booking.id);
+    }
+
     await page.screenshot({ path: 'test-results/TC-019-booking-confirmed.png', fullPage: true });
   });
 
@@ -108,21 +132,31 @@ test.describe('Event Booking Module', () => {
 
   // ── TC-024 ──────────────────────────────────────────────────────────────────
   test('[TC-024] should redirect to My Bookings page after successful booking @regression',
-    async ({ page }) => {
+    async ({ page, request, authToken }) => {
 
     // Arrange
-    const fullName = 'Test User';
-    const email    = 'test@test.com';
-    const phone    = '9876543210';
+    const email = ENV.LOGIN_EMAIL;
+    const phone = '9876543210';
 
     // Act
-    await bookingPage.fillBookingForm(fullName, email, phone);
+    await bookingPage.fillBookingForm(TEST_NAME, email, phone);
     await bookingPage.book(1);
     await bookingPage.assertBookingConfirmed();
     await bookingPage.clickViewMyBookings();
 
     // Assert
     await expect(page).toHaveURL(new RegExp(URLS.BOOKINGS), { timeout: TIMEOUTS.NAVIGATION });
+
+    // Capture booking IDs for cleanup
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    const resp = await request.get(`${URLS.API_BOOKINGS}?limit=100`, { headers });
+    if (resp.ok()) {
+      const json = await resp.json();
+      json.data
+        .filter((b: { customerName: string; id: number }) => b.customerName === TEST_NAME && !createdBookingIds.includes(b.id))
+        .forEach((b: { id: number }) => createdBookingIds.push(b.id));
+    }
+
     await page.screenshot({ path: 'test-results/TC-024-redirect-my-bookings.png', fullPage: true });
   });
 
