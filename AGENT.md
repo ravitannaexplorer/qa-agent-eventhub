@@ -21,10 +21,13 @@ API Docs: https://api.eventhub.rahulshettyacademy.com/api/docs/
 ---
 
 ## Credentials — read from env, never hardcode
-Login email:    process.env.LOGIN_EMAIL  (ravitanna2015@gmail.com)
-Login password: process.env.LOGIN_PASSWORD (Ravitanna@2015)
+Login email:    process.env.LOGIN_EMAIL
+Login password: process.env.LOGIN_PASSWORD
 Admin access:   yes — same credentials have admin access
 API token:      process.env.API_TOKEN
+
+All credentials are stored in .env file only.
+Never hardcode values in any markdown or config file.
 
 ---
 
@@ -68,6 +71,10 @@ TC numbers come from the TestID column in the Excel file.
 
 ## What you may do autonomously
 - Read any file in the repository
+- Before navigating any page with Playwright MCP, check memory.md first.
+  If the page is documented there, use that information instead of re-navigating.
+  Only use MCP to visit a page when memory.md does not have the information
+  you need, or when you suspect the UI has changed.
 - Navigate the live EventHub app using Playwright MCP to 
   inspect UI before writing tests
 - Create new spec files in tests/ui/, tests/api/, tests/e2e/

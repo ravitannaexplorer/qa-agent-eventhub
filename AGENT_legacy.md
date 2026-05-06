@@ -9,8 +9,8 @@ Always read skills/playwright-test-writer/SKILL.md before generating any test.
 - Framework: Playwright + TypeScript
 - Base URL: https://eventhub.rahulshettyacademy.com/
 - Test Credentials:
-  - Email: ravitanna2015@gmail.com
-  - Password: Ravitanna@2015
+  - Email: process.env.LOGIN_EMAIL
+  - Password: process.env.LOGIN_PASSWORD
 - Database: PostgreSQL — always use tests/fixtures/db.fixture.ts
 - Auth: JWT — obtain token via POST /api/auth/login, store in fixture
 - Page Objects: all page interactions go through pages/*.ts

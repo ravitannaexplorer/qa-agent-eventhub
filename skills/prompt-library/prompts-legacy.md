@@ -125,7 +125,7 @@ This way if you want to test TC-002 manually you can write:
   test('manual TC-002 repro', async ({ page }) => {
     const loginPage = new LoginPage(page)
     await loginPage.navigate()
-    await loginPage.login('ravitanna2015@gmail.com', 'wrongpassword')
+    await loginPage.login(process.env.LOGIN_EMAIL!, 'wrongpassword')
     await loginPage.assertErrorMessage('Invalid email or password')
   })
 
@@ -403,7 +403,6 @@ Create `tests/day5-pom.spec.ts`:
 
 Use LoginPage, EventListingPage, EventBookingPage, AdminManageEventsPage.
 Credentials: process.env.LOGIN_EMAIL, process.env.LOGIN_PASSWORD
-(with fallback to 'ravitanna2015@gmail.com' / 'Ravitanna@2015' for local dev only)
 
 test.describe('Login module — POM') — beforeEach: new LoginPage(page), navigate()
   - 'should login with valid credentials and redirect to events or dashboard'

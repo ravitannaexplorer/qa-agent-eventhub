@@ -120,6 +120,41 @@ npx playwright show-report
 
 ---
 
+## Generate test cases for a new module
+
+Use this when you want to create new test cases in Excel for a module that doesn't have coverage yet.
+
+Replace `[MODULE_NAME]` with the module name.
+Replace `[URL_PATH]` with the module URL e.g. `/checkout`.
+
+**Prompt to run in Claude Code:**
+```
+Read AGENT.md and skills/playwright-test-writer/SKILL.md.
+Use Playwright MCP to navigate to [URL_PATH] on EventHub.
+Inspect all interactive elements, user flows and edge cases.
+Generate test cases following this format for each case:
+  - TestID: next available TC number from test-cases-v4.xlsx
+  - Module: [MODULE_NAME]
+  - TestName: human readable description
+  - Priority: High / Medium / Low
+  - InputData: JSON with test inputs
+  - Steps: pipe-separated step list
+  - ExpectedResult: what should happen
+  - TestType: UI / API / E2E
+  - Enabled: TRUE
+
+Cover:
+  - Happy path (at least 1 High priority)
+  - Validation errors (form fields, required inputs)
+  - Auth guard (accessing page without login)
+  - Edge cases (boundary values, empty states)
+
+Output as a markdown table that can be copied into test-cases-v4.xlsx.
+Do not write any test scripts — only generate the test case definitions.
+```
+
+---
+
 ## Regenerate API types and docs
 
 Use this when the EventHub Swagger spec has changed.
