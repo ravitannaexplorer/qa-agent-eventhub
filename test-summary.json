@@ -1,0 +1,16 @@
+{
+  "run_number": "5",
+  "timestamp": "2026-05-15T10:43:40.406Z",
+  "passed": 37,
+  "failed": 6,
+  "skipped": 4,
+  "total": 47,
+  "failedTests": [
+    "[TC-041]",
+    "[TC-041]",
+    "[TC-041]",
+    "[TC-006]",
+    "[TC-006]",
+    "[TC-006]"
+  ]
+}
