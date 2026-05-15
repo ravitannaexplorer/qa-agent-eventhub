@@ -1,0 +1,2 @@
+[      99ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ https://api.eventhub.rahulshettyacademy.com/api/events:0
+[     164ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://api.eventhub.rahulshettyacademy.com/favicon.ico:0
