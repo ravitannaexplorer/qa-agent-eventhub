@@ -94,6 +94,48 @@ jobs:
             npx playwright test tests/ui/ tests/api/ tests/e2e/
           fi
 
+      - name: Generate JSON summary
+        if: ${{ !cancelled() }}
+        run: |
+          node -e "
+          const fs = require('fs');
+          const resultsPath = 'test-results/results.json';
+          if (!fs.existsSync(resultsPath)) {
+            const summary = { passed: 0, failed: 0, skipped: 0, failedTests: [], error: 'results.json not found' };
+            fs.writeFileSync('test-summary.json', JSON.stringify(summary));
+            process.exit(0);
+          }
+          const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+          let passed = 0, failed = 0, skipped = 0;
+          const failedTests = [];
+          for (const suite of results.suites || []) {
+            for (const spec of suite.specs || []) {
+              for (const test of spec.tests || []) {
+                for (const result of test.results || []) {
+                  if (result.status === 'passed') passed++;
+                  else if (result.status === 'failed') {
+                    failed++;
+                    const tcMatch = spec.title.match(/\[TC-\d+\][^\]\"]*/) || test.title.match(/\[TC-\d+\][^\]\"]*/) || [{0: spec.title}];
+                    if (tcMatch) failedTests.push(tcMatch[0].trim());
+                  }
+                  else if (result.status === 'skipped') skipped++;
+                }
+              }
+            }
+          }
+          const summary = { passed, failed, skipped, total: passed + failed + skipped, failedTests };
+          fs.writeFileSync('test-summary.json', JSON.stringify(summary, null, 2));
+          console.log('Summary:', JSON.stringify(summary));
+          "
+
+      - name: Upload test summary
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: test-summary-${{ github.run_number }}
+          path: test-summary.json
+          retention-days: 30
+
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
