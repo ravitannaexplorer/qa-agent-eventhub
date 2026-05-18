@@ -1,14 +1,11 @@
 {
-  "run_number": "5",
-  "timestamp": "2026-05-15T10:43:40.406Z",
-  "passed": 37,
-  "failed": 6,
-  "skipped": 4,
-  "total": 47,
+  "run_number": "6",
+  "timestamp": "2026-05-18T05:44:51.567Z",
+  "passed": 64,
+  "failed": 3,
+  "skipped": 6,
+  "total": 73,
   "failedTests": [
-    "[TC-041]",
-    "[TC-041]",
-    "[TC-041]",
     "[TC-006]",
     "[TC-006]",
     "[TC-006]"
